@@ -87,103 +87,97 @@ export default {
       this.removeProductFromCart(producto.id);
     },
     realizarCompra() {
-    // Verificar si el usuario está logueado
-    if (!this.loggedIn) {
-      this.$router.push({ name: "loginUsuario" });
-      return;
-    }
-    // Obtener los detalles del carrito
-    const carrito = this.$store.getters.carrito;
-    console.log('carrito', carrito)
-    console.log('compra', {usuario: this.user,
-productos: this.cartItems,
-total: this.calculateTotalPrice,})
-    // Realizar la solicitud a la API para enviar el pedido
-    fetch(API_URL_COMPRAS, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        usuario: this.user,
-productos: this.cartItems,
-total: this.calculateTotalPrice,
-      }),
-    })
-      .then(response => response.json())
-      .then(() => {
-        // Reiniciar el carrito y mostrar un mensaje de éxito
-        this.$store.dispatch('vaciarCarrito');
-        Swal.fire({
-          icon: 'success',
-          title: 'Compra realizada',
-          text: 'Gracias por tu compra',
-        });
-        // Redirigir al usuario a la página de pedidos
-        this.$router.push({ name: 'listadoProductos' });
+      if (!this.loggedIn) {
+        this.$router.push({ name: "loginUsuario" });
+        return;
+      }
+      const carrito = this.$store.getters.carrito;
+      console.log(carrito);
+      fetch(API_URL_COMPRAS, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          usuario: this.user,
+          productos: this.cartItems,
+          total: this.calculateTotalPrice,
+        }),
       })
-      .catch(error => {
-        console.error('Error al realizar la compra:', error);
-        // Mostrar un mensaje de error
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al realizar la compra',
-          text: 'Por favor, inténtalo nuevamente',
+        .then(response => response.json())
+        .then(() => {
+
+          this.$store.dispatch('vaciarCarrito');
+          Swal.fire({
+            icon: 'success',
+            title: 'Compra realizada',
+            text: 'Gracias por tu compra',
+          });
+
+          this.$router.push({ name: 'listadoProductos' });
+        })
+        .catch(error => {
+          console.error('Error al realizar la compra:', error);
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al realizar la compra',
+            text: 'Por favor, inténtalo nuevamente',
+          });
         });
-      });
       this.$store.commit("clearCartItems");
-      
-  },
+
+    },
   },
 };
 </script>
-  <style scoped>
-  .header-carrito {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: #f5f5f5;
-    border-bottom: 1px solid #ccc;
-  }
-  
-  .btn-cerrar {
-    background-color: transparent;
-    border: none;
-    outline: none;
-    cursor: pointer;
-  }
-  
-  .table {
-    margin-top: 10px;
-  }
-  
-  .img-carrito {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-  }
-  
-  .cantidad {
-    margin: 0 5px;
-  }
-  
-  .total-carrito {
-    margin-top: 10px;
-    font-weight: bold;
-  }
-  
-  .carrito-icono {
-    top: -10px;
-    right: -10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 20px;
-    height: 20px;
-    background-color: #dc3545;
-    color: #fff;
-    font-size: 12px;
-    border-radius: 50%;
-  }
-  </style>
+<style scoped>
+.header-carrito {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ccc;
+}
+
+.btn-cerrar {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.table {
+  margin-top: 10px;
+}
+
+.img-carrito {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+
+.cantidad {
+  margin: 0 5px;
+}
+
+.total-carrito {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.carrito-icono {
+  top: -10px;
+  right: -10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  background-color: #dc3545;
+  color: #fff;
+  font-size: 12px;
+  border-radius: 50%;
+}
+</style>

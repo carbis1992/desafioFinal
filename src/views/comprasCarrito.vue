@@ -59,9 +59,7 @@ export default {
             this.usuario = this.compras[i].usuario;
             return this.usuario;
           }
-          console.log("Compras:", this.compras);
           this.usuario = this.compras.usuario;
-          console.log('email', this.usuario)
         })
         .catch(error => {
           console.error('Error al obtener las compras:', error);

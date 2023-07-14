@@ -8,7 +8,6 @@ import detalleProducto from '../views/detalleProducto.vue';
 import comprasCarrito from '../views/comprasCarrito.vue';
 import listadoProductosAdmin from '../views/listadoProductosAdmin.vue';
 import editarProducto from '../views/editarProducto.vue';
-// import { store } from '../store/index.js';
 
 Vue.use(VueRouter)
 
