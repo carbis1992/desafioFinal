@@ -62,16 +62,13 @@ import { mapActions } from "vuex";
 import { mapGetters } from "vuex";
 export default {
   name: "HeaderBar",
-  props: {
-    isAdmin: Boolean,
-  },
   data() {
     return {
       showMenu: true,
     };
   },
   computed: {
-    ...mapGetters(["cartItemCount", "loggedIn"]),
+    ...mapGetters(["cartItemCount", "loggedIn", "isAdmin"]),
   },
   methods: {
     ...mapActions(["logoutUser"]),

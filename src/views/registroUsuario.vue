@@ -46,62 +46,54 @@
 </template>
   
 <script>
-import Swal from "sweetalert2";
-import { API_URL_USERS } from "../constants";
+import { showAlert } from '../utils/utils';
+import { postData } from "../api/api";
 import { mapActions } from "vuex";
+import { API_URL_USERS } from "../constants";
+
 export default {
-    name: "registroUsuario",
-    data() {
-        return {
-            registered: false,
-            user: {
-                email: "",
-                password: "",
-                address: "",
-                city: "",
-                state: "",
-            },
-        };
-    },
-    methods: {
-        ...mapActions(["initializeUser"]),
-        alertSuccess() {
-            const email = this.user.email;
-            const password = this.user.password;
-            const passwordRegex = /^(?=.*[A-Z])(?=.*\d).+$/;
+  name: "registroUsuario",
+  data() {
+    return {
+      registered: false,
+      user: {
+        email: "",
+        password: "",
+        address: "",
+        city: "",
+        state: "",
+      },
+    };
+  },
+  methods: {
+    ...mapActions(["initializeUser"]),
+    async alertSuccess() {
+      const email = this.user.email;
+      const password = this.user.password;
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d).+$/;
 
-            if (email === '' || password === '') {
-                Swal.fire({
-                    title: "Error",
-                    text: "Por favor, complete todos los campos",
-                    icon: "error",
-                    confirmButtonText: "Aceptar",
-                });
-            } else if (!passwordRegex.test(password)) {
-                Swal.fire({
-                    title: "Contraseña inválida",
-                    text: "La contraseña debe contener al menos una mayúscula y un número",
-                    icon: "error",
-                });
-                return;
-            } else {
-                this.initializeUser(this.user);
-                localStorage.setItem("user", JSON.stringify(this.user));
-                this.$router.push({ name: 'listadoProductos' });
-                this.registered = true;
-            }
-
-            fetch(API_URL_USERS, {
-                method: 'POST',
-                body: JSON.stringify(this.user),
-                headers: {
-                    'Content-type': 'application/json; charset=UTF-8',
-                },
-            })
-                .then((response) => response.json())
-                .then((json) => console.log(json));
+      if (email === "" || password === "") {
+        showAlert("Por favor, complete todos los campos", "error");
+      } else if (!passwordRegex.test(password)) {
+        showAlert(
+          "La contraseña debe contener al menos una mayúscula y un número",
+          "error"
+        );
+      } else {
+        try {
+          await postData(API_URL_USERS, this.user);
+          this.initializeUser(this.user);
+          localStorage.setItem("user", JSON.stringify(this.user));
+          showAlert("Registro exitoso", "success");
+          this.$router.push({ name: "listadoProductos" });
+          this.registered = true;
+        } catch (error) {
+          console.error("Error:", error);
+          showAlert("Error al registrar el usuario", "error");
         }
+      }
     },
+}
 };
 </script>
   

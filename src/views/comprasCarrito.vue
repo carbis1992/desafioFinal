@@ -1,13 +1,15 @@
 <template>
-  <div>
+  <div class="pedidos-container">
     <h1>Pedidos</h1>
     <div v-if="compras.length === 0">
       No tienes compras realizadas.
     </div>
     <div v-else>
       <div v-for="pedido in compras" :key="pedido.id">
-        <h2>Pedido {{ pedido.id }}: </h2>
-        <p>Usuario: {{ pedido.usuario.user.email }}</p>
+        <div class="usuario-pedido">
+          <h4>Pedido {{ pedido.id }}: </h4>
+          <p>Usuario: {{ pedido.usuario.user.email }}</p>
+        </div>
         <table class="table">
           <thead>
             <tr>
@@ -35,9 +37,13 @@
 </template>
   
 <script>
+import { fetchData } from '../api/api';
+import { showAlert } from '../utils/utils';
 import { API_URL_COMPRAS } from '../constants';
+import { mapGetters } from 'vuex';
+
 export default {
-  name: "comprasCarrito",
+  name: 'comprasCarrito',
   data() {
     return {
       compras: [],
@@ -47,31 +53,53 @@ export default {
     };
   },
   created() {
-    this.fetchCompras();
+    if (!this.loggedIn || !this.isAdmin) {
+      this.$router.push({ name: 'loginUsuario' });
+    } else {
+      this.fetchCompras();
+    }
+  },
+  computed: {
+    ...mapGetters(['loggedIn', 'isAdmin']),
   },
   methods: {
     fetchCompras() {
-      fetch(API_URL_COMPRAS)
-        .then(response => response.json())
-        .then(data => {
+      fetchData(API_URL_COMPRAS)
+        .then((data) => {
           this.compras = data;
-          for (let i = 0; i < this.compras.length; i++) {
-            this.usuario = this.compras[i].usuario;
-            return this.usuario;
-          }
-          this.usuario = this.compras.usuario;
+          this.usuario = data.usuario;
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error al obtener las compras:', error);
+          showAlert('Error al obtener las compras', 'error');
         });
     },
   },
 };
+
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .total-pedidos {
   float: right;
+}
+
+.pedidos-container{
+  margin-right: 40px;
+  margin-left: 40px;
+}
+
+.usuario-pedido{
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
+  h4{
+    margin: 0;
+  }
+
+  p{
+    margin: 0;
+  }
 }
 </style>
   

@@ -52,18 +52,20 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapGetters } from "vuex";
-import Swal from "sweetalert2";
-import { API_URL_COMPRAS } from "../constants";
+import { postData } from '../api/api';
+import { showAlert } from '../utils/utils';
+import { API_URL_COMPRAS } from '../constants';
+import { mapState, mapActions, mapGetters } from 'vuex';
+
 export default {
   computed: {
     ...mapState({
       cartItems: (state) => state.cart.cartItems,
       setUser: (state) => state.user,
     }),
-    ...mapState(["user"]),
-    ...mapGetters(["loggedIn"]),
-    ...mapGetters(["cartItemCount"]),
+    ...mapState(['user']),
+    ...mapGetters(['loggedIn']),
+    ...mapGetters(['cartItemCount']),
     calculateTotalPrice() {
       return this.cartItems.reduce(
         (total, producto) => total + producto.precio * producto.cantidad,
@@ -72,7 +74,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["updateQuantity", "removeProductFromCart"]),
+    ...mapActions(['updateQuantity', 'removeProductFromCart']),
     incrementQuantity(producto) {
       const newQuantity = producto.cantidad + 1;
       this.updateQuantity({ productId: producto.id, quantity: newQuantity });
@@ -88,48 +90,30 @@ export default {
     },
     realizarCompra() {
       if (!this.loggedIn) {
-        this.$router.push({ name: "loginUsuario" });
+        this.$router.push({ name: 'loginUsuario' });
         return;
       }
-      const carrito = this.$store.getters.carrito;
-      console.log(carrito);
-      fetch(API_URL_COMPRAS, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          usuario: this.user,
-          productos: this.cartItems,
-          total: this.calculateTotalPrice,
-        }),
-      })
-        .then(response => response.json())
+
+      const compraData = {
+        usuario: this.user,
+        productos: this.cartItems,
+        total: this.calculateTotalPrice,
+      };
+
+      postData(API_URL_COMPRAS, compraData)
         .then(() => {
-
           this.$store.dispatch('vaciarCarrito');
-          Swal.fire({
-            icon: 'success',
-            title: 'Compra realizada',
-            text: 'Gracias por tu compra',
-          });
-
+          showAlert('Compra realizada', 'success');
           this.$router.push({ name: 'listadoProductos' });
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error al realizar la compra:', error);
-
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al realizar la compra',
-            text: 'Por favor, inténtalo nuevamente',
-          });
+          showAlert('Error al realizar la compra', 'error');
         });
-      this.$store.commit("clearCartItems");
-
     },
   },
 };
+
 </script>
 <style scoped>
 .header-carrito {

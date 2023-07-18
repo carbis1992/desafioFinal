@@ -55,8 +55,11 @@
 </template>
   
 <script>
-import Swal from 'sweetalert2';
+import { mapGetters } from "vuex";
+import { fetchData, postData, deleteData } from '../api/api';
+import { showAlert } from '../utils/utils';
 import { API_URL_PRODUCTS } from '../constants';
+
 export default {
   name: "listadoProductosAdmin",
   data() {
@@ -71,42 +74,49 @@ export default {
     };
   },
   created() {
-    this.getProducts();
+    if (!this.isAdmin) {
+      this.$router.push({ name: "loginUsuario" });
+    }
+    this.fetchProducts();
+  },
+  computed: {
+    ...mapGetters(["loggedIn", "isAdmin"])
   },
   methods: {
-    getProducts() {
-      fetch(API_URL_PRODUCTS)
-        .then((response) => response.json())
-        .then((data) => {
-          this.productos = data.map((producto) => ({
-            ...producto,
-            cantidad: 0,
-          }));
-        });
+    async fetchProducts() {
+      try {
+        const data = await fetchData(API_URL_PRODUCTS);
+        this.productos = data.map((producto) => ({
+          ...producto,
+          cantidad: 0,
+        }));
+      } catch (error) {
+        console.error('Error:', error);
+        showAlert('Error al obtener los productos', 'error');
+      }
     },
-    agregarProducto(producto) {
-      fetch(API_URL_PRODUCTS, {
-        method: "POST",
-        body: JSON.stringify(producto),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          const nuevoProductoId = data.id;
-          this.id = "";
-          this.nombre = "";
-          this.descripcion = "";
-          this.precio = "";
-          this.stock = "";
-          this.imagen = "";
-          const nuevoProducto = { ...producto, id: nuevoProductoId, cantidad: 0 };
-          this.productos.unshift(nuevoProducto);
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
+
+    async agregarProducto(producto) {
+      try {
+        const data = await postData(API_URL_PRODUCTS, producto);
+        const nuevoProducto = { ...data, cantidad: 0 };
+        this.productos.unshift(nuevoProducto);
+        showAlert('Producto agregado exitosamente', 'success');
+      } catch (error) {
+        console.error('Error:', error);
+        showAlert('Error al agregar el producto', 'error');
+      }
+    },
+
+    async eliminarProducto(id) {
+      try {
+        await deleteData(API_URL_PRODUCTS, id);
+        this.productos = this.productos.filter((producto) => producto.id !== id);
+        showAlert('Producto eliminado exitosamente', 'success');
+      } catch (error) {
+        console.error('Error:', error);
+        showAlert('Error al eliminar el producto', 'error');
+      }
     },
     agregarProductos() {
       const producto = {
@@ -126,24 +136,7 @@ export default {
       this.precio = producto.precio;
       this.stock = producto.stock;
       this.imagen = producto.imagen;
-      this.$router.push({ name: "editarProducto", params: { id: producto.id } });
-    },
-    eliminarProducto(id) {
-      fetch(`${API_URL_PRODUCTS}/${id}`, {
-        method: "DELETE",
-      })
-        .then((response) => response.json())
-        .then(() => {
-          this.productos = this.productos.filter((producto) => producto.id !== id);
-          Swal.fire({
-            icon: 'success',
-            title: 'Eliminado',
-            text: 'Has eliminado el producto!',
-          });
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
+      this.$router.push({ name: 'editarProducto', params: { id: producto.id } });
     },
   },
 };

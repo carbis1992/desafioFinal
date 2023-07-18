@@ -18,7 +18,7 @@ const routes = [
   { path: "/carrito", component: carrito, name: "carrito" },
   { path: "/detalle/:id", component: detalleProducto, name: "detalleProducto" },
   { path: "/compras", component: comprasCarrito, name: "comprasCarrito" },
-  { path: "/admin", component: listadoProductosAdmin, name: "listadoProductosAdmin" },
+  { path: "/admin", component: listadoProductosAdmin, name: "listadoProductosAdmin", meta: { requiresAuth: true, isAdmin: true } },
   { path: "/editar/:id", component: editarProducto, name: "editarProducto" },
 ]
 

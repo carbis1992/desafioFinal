@@ -27,8 +27,10 @@
 </template>
   
 <script>
-import { API_URL_PRODUCTS } from "../constants";
+import { fetchData } from "../api/api";
+import { showAlert } from '../utils/utils';
 import { mapActions } from "vuex";
+import { API_URL_PRODUCTS } from "../constants";
 export default {
   name: "listadoProductos",
   data() {
@@ -40,15 +42,17 @@ export default {
     this.getProducts();
   },
   methods: {
-    getProducts() {
-      fetch(API_URL_PRODUCTS)
-        .then((response) => response.json())
-        .then((data) => {
-          this.productos = data.map((producto) => ({
-            ...producto,
-            cantidad: 0,
-          }));
-        });
+    async getProducts() {
+      try {
+        const data = await fetchData(API_URL_PRODUCTS);
+        this.productos = data.map((producto) => ({
+          ...producto,
+          cantidad: 0,
+        }));
+      } catch (error) {
+        console.error("Error:", error);
+        showAlert("Error al obtener los productos", "error");
+      }
     },
     sendProduct(producto) {
       this.$router.push({
@@ -57,8 +61,8 @@ export default {
       });
     },
     ...mapActions(["addProductToCart"]),
-    agregarAlCarrito(producto) {
-      producto.cantidad++; 
+    async agregarAlCarrito(producto) {
+      producto.cantidad++;
       this.addProductToCart(producto);
     },
   },
