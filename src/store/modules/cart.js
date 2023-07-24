@@ -5,7 +5,7 @@ const state = {
 
 const getters = {
   cartItemCount: (state) => {
-    return state.cartItems.length;
+    return state.cartItems.reduce((total, item) => total + item.cantidad, 0);
   },
   getCartItemById: (state) => (productId) => {
     return state.cartItems.find((item) => item.id === productId);
@@ -17,9 +17,9 @@ const mutations = {
     const existingItem = state.cartItems.find((item) => item.id === product.id);
 
     if (existingItem) {
-      existingItem.cantidad += product.cantidad;
+      existingItem.cantidad += 1;
     } else {
-      state.cartItems.push(product);
+      state.cartItems.push({ ...product, cantidad: 1 });
     }
   },
   updateCartItemQuantity(state, { productId, quantity }) {
@@ -41,8 +41,17 @@ const mutations = {
 };
 
 const actions = {
-  addProductToCart({ commit }, product) {
-    commit("addToCart", product);
+  addProductToCart({ commit, getters }, product) {
+    const cartItem = getters.getCartItemById(product.id);
+
+    if (cartItem) {
+      commit("updateCartItemQuantity", {
+        productId: product.id,
+        quantity: cartItem.cantidad + 1
+      });
+    } else {
+      commit("addToCart", product);
+    }
   },
   updateQuantity({ commit }, { productId, quantity }) {
     commit("updateCartItemQuantity", { productId, quantity });

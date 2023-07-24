@@ -49,7 +49,6 @@ export default {
         },
         ...mapActions(["addProductToCart"]),
         agregarProductoAlCarrito(producto) {
-            producto.cantidad++;
             this.addProductToCart(producto);
         },
     }
