@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+
 import listadoProductos from '../views/listadoProductos.vue';
 import loginUsuario from '../views/loginUsuario.vue';
 import registroUsuario from '../views/registroUsuario.vue';
@@ -23,7 +24,9 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  routes
+  mode: "history",
+  base: process.env.VUE_APP_BASE_URL,
+  routes,
 })
 
 export default router
