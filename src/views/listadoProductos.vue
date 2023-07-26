@@ -60,7 +60,7 @@ export default {
         params: { id: producto.id },
       });
     },
-    ...mapActions(["addProductToCart"]),
+    ...mapActions(["addProductToCart", ]),
     async agregarAlCarrito(producto) {
       this.addProductToCart(producto);
     },

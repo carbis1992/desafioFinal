@@ -6,7 +6,8 @@
     </div>
     <div v-else>
       <div v-for="pedido in compras" :key="pedido.id">
-        <div class="usuario-pedido">
+        <div  v-if="pedido.usuario.user">
+          <div class="usuario-pedido">
           <h4>Pedido {{ pedido.id }}: </h4>
           <p>Usuario: {{ pedido.usuario.user.email }}</p>
         </div>
@@ -31,6 +32,8 @@
           </tbody>
         </table>
         <p class="total-pedidos"><strong> Total: {{ pedido.total }}</strong></p>
+        </div>
+        
       </div>
     </div>
   </div>
@@ -48,7 +51,8 @@ export default {
     return {
       compras: [],
       usuario: {
-        email: '',
+        user: {
+        },
       },
     };
   },

@@ -55,39 +55,14 @@
 import { postData } from '../api/api';
 import { showAlert } from '../utils/utils';
 import { API_URL_COMPRAS } from '../constants';
-import { mapState, mapActions, mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   computed: {
-    ...mapState({
-      cartItems: (state) => state.cart.cartItems,
-      setUser: (state) => state.user,
-    }),
-    ...mapState(['user']),
-    ...mapGetters(['loggedIn']),
-    ...mapGetters(['cartItemCount']),
-    calculateTotalPrice() {
-      return this.cartItems.reduce(
-        (total, producto) => total + producto.precio * producto.cantidad,
-        0
-      );
-    },
+    ...mapGetters(['loggedIn', 'cartItems', 'calculateTotalPrice']),
   },
   methods: {
-    ...mapActions(['updateQuantity', 'removeProductFromCart']),
-    incrementQuantity(producto) {
-      const newQuantity = producto.cantidad + 1;
-      this.updateQuantity({ productId: producto.id, quantity: newQuantity });
-    },
-    decrementQuantity(producto) {
-      if (producto.cantidad > 0) {
-        const newQuantity = producto.cantidad - 1;
-        this.updateQuantity({ productId: producto.id, quantity: newQuantity });
-      }
-    },
-    removeFromCart(producto) {
-      this.removeProductFromCart(producto.id);
-    },
+    ...mapActions(['incrementQuantity', 'decrementQuantity', 'removeProductFromCart', 'vaciarCarrito']),
     realizarCompra() {
       if (!this.loggedIn) {
         this.$router.push({ name: 'loginUsuario' });
@@ -111,10 +86,19 @@ export default {
           showAlert('Error al realizar la compra', 'error');
         });
     },
+    incrementQuantity(producto) {
+      this.$store.dispatch('incrementQuantity', producto);
+    },
+    decrementQuantity(producto) {
+      this.$store.dispatch('decrementQuantity', producto);
+    },
+    removeFromCart(producto) {
+      this.$store.dispatch('removeProductFromCart', producto.id);
+    },
   },
 };
-
 </script>
+
 <style scoped>
 .header-carrito {
   display: flex;

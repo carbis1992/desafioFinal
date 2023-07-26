@@ -1,4 +1,3 @@
-// store/modules/cart.js
 const state = {
   cartItems: [],
 };
@@ -9,6 +8,15 @@ const getters = {
   },
   getCartItemById: (state) => (productId) => {
     return state.cartItems.find((item) => item.id === productId);
+  },
+  cartItems: (state) => {
+    return state.cartItems.map((item) => ({
+      ...item,
+      cantidad: item.cantidad,
+    }));
+  },
+  calculateTotalPrice: (state) => {
+    return state.cartItems.reduce((total, item) => total + item.precio * item.cantidad, 0);
   },
 };
 
@@ -32,12 +40,9 @@ const mutations = {
   removeProductFromCart(state, productId) {
     state.cartItems = state.cartItems.filter((item) => item.id !== productId);
   },
-  setCartItems(state, items) {
-    state.cartItems = items;
-  },
   clearCartItems(state) {
     state.cartItems = [];
-  }
+  },
 };
 
 const actions = {
@@ -45,22 +50,24 @@ const actions = {
     const cartItem = getters.getCartItemById(product.id);
 
     if (cartItem) {
-      commit("updateCartItemQuantity", {
-        productId: product.id,
-        quantity: cartItem.cantidad + 1
-      });
+      commit("updateCartItemQuantity", { productId: product.id, quantity: cartItem.cantidad + 1 });
     } else {
-      commit("addToCart", product);
+      commit("addToCart", { ...product, cantidad: 1 });
     }
   },
-  updateQuantity({ commit }, { productId, quantity }) {
-    commit("updateCartItemQuantity", { productId, quantity });
+  incrementQuantity({ commit }, product) {
+    commit("updateCartItemQuantity", { productId: product.id, quantity: product.cantidad + 1 });
+  },
+  decrementQuantity({ commit }, product) {
+    if (product.cantidad > 0) {
+      commit("updateCartItemQuantity", { productId: product.id, quantity: product.cantidad - 1 });
+    }
   },
   removeProductFromCart({ commit }, productId) {
     commit("removeProductFromCart", productId);
   },
   vaciarCarrito({ commit }) {
-    commit("setCartItems", []);
+    commit("clearCartItems");
   },
 };
 

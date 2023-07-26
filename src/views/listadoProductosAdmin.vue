@@ -102,6 +102,12 @@ export default {
         const nuevoProducto = { ...data, cantidad: 0 };
         this.productos.unshift(nuevoProducto);
         showAlert('Producto agregado exitosamente', 'success');
+        this.id= "",
+        this.nombre= "",
+        this.descripcion= "",
+        this.precio= "",
+        this.stock= "",
+        this.imagen= ""
       } catch (error) {
         console.error('Error:', error);
         showAlert('Error al agregar el producto', 'error');
