@@ -9,12 +9,7 @@ const getters = {
   getCartItemById: (state) => (productId) => {
     return state.cartItems.find((item) => item.id === productId);
   },
-  cartItems: (state) => {
-    return state.cartItems.map((item) => ({
-      ...item,
-      cantidad: item.cantidad,
-    }));
-  },
+  cartItems: state => state.cartItems,
   calculateTotalPrice: (state) => {
     return state.cartItems.reduce((total, item) => total + item.precio * item.cantidad, 0);
   },
@@ -22,13 +17,7 @@ const getters = {
 
 const mutations = {
   addToCart(state, product) {
-    const existingItem = state.cartItems.find((item) => item.id === product.id);
-
-    if (existingItem) {
-      existingItem.cantidad += 1;
-    } else {
-      state.cartItems.push({ ...product, cantidad: 1 });
-    }
+    state.cartItems.push(product)
   },
   updateCartItemQuantity(state, { productId, quantity }) {
     const existingItem = state.cartItems.find((item) => item.id === productId);
