@@ -13,7 +13,7 @@ import editarProducto from '../views/editarProducto.vue';
 Vue.use(VueRouter)
 
 const routes = [
-  { path: "/", component: listadoProductos, name: "listadoProductos" },
+  { path: "/desafioFinal", component: listadoProductos, name: "listadoProductos" },
   { path: "/login", component: loginUsuario, name: "loginUsuario" },
   { path: "/registro", component: registroUsuario, name: "registroUsuario" },
   { path: "/carrito", component: carrito, name: "carrito" },
