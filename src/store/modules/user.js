@@ -1,4 +1,4 @@
-export const cart = {
+export const user = {
   state: {
     user: null
   },
